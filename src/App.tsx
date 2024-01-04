@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 
 //im making a twitter advanced search extension
 
@@ -9,6 +9,16 @@ export default function App() {
   const [includeReplies, setIncludeReplies] = createSignal(true);
   const [fromDate, setFromDate] = createSignal("");
   const [toDate, setToDate] = createSignal("");
+  const [isDarkMode, setIsDarkMode] = createSignal(false);
+
+  // Check for initial preference
+  onMount(() => {
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    setIsDarkMode(prefersDark);
+    document.documentElement.classList.toggle("dark", prefersDark);
+  });
 
   const onSubmit = (e: any) => {
     e.preventDefault();
@@ -36,76 +46,78 @@ export default function App() {
   };
 
   return (
-    <div
-      style={{
-        width: "400px",
-        height: "450px",
-        padding: "8px",
-        background: "black",
-      }}
-    >
-      <form action="">
-        <TextInputComponent
-          label="All of these words"
-          value={word()}
-          onChange={(e) => setWord(e.target.value)}
-          subtext={`Example: agi`}
-        />
+    <div class={isDarkMode() === true ? "theme-dark" : "theme-light"}>
+      <div
+        style={{
+          width: "400px",
+          height: "450px",
+          padding: "8px",
+          background: isDarkMode() ? "black" : "white",
+        }}
+      >
+        <form action="">
+          <TextInputComponent
+            label="All of these words"
+            value={word()}
+            onChange={(e) => setWord(e.target.value)}
+            subtext={`Example: agi`}
+          />
 
-        <TextInputComponent
-          label="From this account"
-          value={account()}
-          onChange={(e) => setAccount(e.target.value)}
-          subtext="Example: that_anokha_boy · sent from that_anokha_boy"
-        />
+          <TextInputComponent
+            label="From this account"
+            value={account()}
+            onChange={(e) => setAccount(e.target.value)}
+            subtext="Example: that_anokha_boy · sent from that_anokha_boy"
+          />
 
-        <TextInputComponent
-          label="Minimum likes"
-          value={minLikes()}
-          onChange={(e) => setMinLikes(e.target.value)}
-          subtext="Example: 69 · contains “69”"
-        />
+          <TextInputComponent
+            label="Minimum likes"
+            value={minLikes()}
+            onChange={(e) => setMinLikes(e.target.value)}
+            subtext="Example: 69 · contains “69”"
+          />
 
-        <CheckboxComponent
-          label="Include replies"
-          value={includeReplies()}
-          onChange={(e) => setIncludeReplies(e.target.checked)}
-        />
+          <CheckboxComponent
+            label="Include replies"
+            value={includeReplies()}
+            onChange={(e) => setIncludeReplies(e.target.checked)}
+          />
 
-        <h1>Dates</h1>
-        <div date-rangepicker class="mb-6 flex justify-between">
-          <div class="relative">
-            <div class="text-white">From</div>
-            <input
-              name="start"
-              type="date"
-              value={fromDate()}
-              onChange={(e) => setFromDate(e.target.value)}
-              class="bg-black border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-black dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Select date start"
-            />
+          <h1>Dates</h1>
+          <div date-rangepicker class="mb-6 flex justify-between">
+            <div class="relative">
+              <div class="text-black dark:text-white">From</div>
+              <input
+                name="start"
+                type="date"
+                value={fromDate()}
+                onChange={(e) => setFromDate(e.target.value)}
+                class="bg-white border-gray-300 dark:border-gray-800 color-scheme:light dark:[color-scheme:dark] dark:bg-black border accent-slate-600  text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-black-700  dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Select date start"
+              />
+            </div>
+            <div class="relative">
+              <div class="text-black dark:text-white">Till</div>
+              <input
+                name="end"
+                type="date"
+                value={toDate()}
+                onChange={(e) => setToDate(e.target.value)}
+                class="bg-white border-gray-300 dark:border-gray-800 color-scheme:light dark:[color-scheme:dark] dark:bg-black border accent-slate-600  text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-black-700  dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Select date end"
+              />
+            </div>
           </div>
-          <div class="relative">
-          <div class="text-white">Till</div>
-            <input
-              name="end"
-              type="date"
-              value={toDate()}
-              onChange={(e) => setToDate(e.target.value)}
-              class="bg-black border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-black-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Select date end"
-            />
+          <div class="flex justify-center">
+            <button
+              onClick={onSubmit}
+              class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            >
+              Search
+            </button>
           </div>
-        </div>
-        <div class="flex justify-center">
-          <button
-            onClick={onSubmit}
-            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-          >
-            Search
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
@@ -125,7 +137,7 @@ function TextInputComponent({
   return (
     <div class="relative w-full min-w-[200px] my-4">
       <input
-        class="peer w-full h-full bg-black text-white font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-gray-700 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-gray-800 placeholder-shown:border-t-gray-800 border focus:border-2 border-t-transparent focus:border-t-transparent text-sm px-3 py-2.5 rounded-[7px] border-gray-800 focus:border-blue-500"
+        class="peer w-full h-full bg-white dark:bg-black text-black dark:text-white font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-gray-700 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-gray-800 placeholder-shown:border-t-gray-800 border focus:border-2 border-t-transparent focus:border-t-transparent text-sm px-3 py-2.5 rounded-[7px] border-gray-300 dark:border-gray-800 focus:border-blue-500"
         placeholder=""
         onChange={onChange}
         value={value ? value : ""}
@@ -182,7 +194,7 @@ function CheckboxComponent({ label, value, onChange }: CheckboxComponentProps) {
         </span>
       </label>
       <label
-        class="mt-px  font-bold text-white cursor-pointer select-none"
+        class="mt-px  font-bold text-black cursor-pointer select-none dark:text-white"
         for="check"
       >
         {label}
