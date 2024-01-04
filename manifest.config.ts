@@ -13,8 +13,8 @@ export default defineManifest(async (env) => ({
   manifest_version: 3,
   name:
     env.mode === "staging"
-      ? "[INTERNAL] Twitter Advanced search"
-      : "Twitter Advanced Ssearch",
+      ? "[INTERNAL] Twitter Advanced Search"
+      : "Twitter Advanced Search",
   // up to four numbers separated by dots
   version: `${major}.${minor}.${patch}.${label}`,
   // semver is OK in "version_name"
@@ -31,11 +31,11 @@ export default defineManifest(async (env) => ({
     128: "public/icons/icon128.png",
   },
 
-  content_scripts: [
-    {
-      //should match exact url
-      matches: ["https://twitter.com/*"],
-      js: ["scripts/twitter.js"],
-    },
-  ],
+  // content_scripts: [
+  //   {
+  //     //should match exact url
+  //     matches: ["https://twitter.com/*"],
+  //     js: ["scripts/twitter.js"],
+  //   },
+  // ],
 }));
