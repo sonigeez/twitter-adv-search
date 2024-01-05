@@ -11,6 +11,7 @@ export default function App() {
   const [toDate, setToDate] = createSignal("");
   const [isDarkMode, setIsDarkMode] = createSignal(false);
   const [follows, setFollows] = createSignal(false);
+  let accountHistory: string[] = getAccountLocalStorage();
 
   // Check for initial preference
   onMount(() => {
@@ -18,8 +19,33 @@ export default function App() {
       "(prefers-color-scheme: dark)"
     ).matches;
     setIsDarkMode(prefersDark);
+    console.log(getAccountLocalStorage());
     document.documentElement.classList.toggle("dark", prefersDark);
   });
+
+  //function to store key value pair in local storage
+  function setLocalStorage(key: string, value: any) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  //function to get key value pair from local storage
+  function getLocalStorage(key: string) {
+    const value = localStorage.getItem(key);
+    if (value) {
+      return JSON.parse(value);
+    }
+  }
+
+  //function to store a account in local storage
+  function setAccountLocalStorage(value: string) {
+    const accounts = new Set(getAccountLocalStorage());
+    accounts.add(value);
+    setLocalStorage("accounts", Array.from(accounts));
+  }
+  //function to get accounts from local storage
+  function getAccountLocalStorage() {
+    return getLocalStorage("accounts");
+  }
 
   const onSubmit = (e: any) => {
     e.preventDefault();
@@ -29,6 +55,7 @@ export default function App() {
     }
     if (account()) {
       url += "%20(from%3A" + account() + ")";
+      setAccountLocalStorage(account());
     }
     if (minLikes()) {
       url += "%20min_faves%3A" + minLikes();
@@ -45,9 +72,9 @@ export default function App() {
     if (toDate()) {
       url += "%20until%3A" + toDate();
     }
-
     window.open(url, "_blank");
   };
+
 
   return (
     <div class={isDarkMode() === true ? "theme-dark" : "theme-light"}>
@@ -106,6 +133,7 @@ export default function App() {
             value={account()}
             onChange={(e) => setAccount(e.target.value)}
             subtext="Example: that_anokha_boy · sent from that_anokha_boy"
+            recommended={accountHistory}
           />
 
           <TextInputComponent
@@ -146,7 +174,7 @@ export default function App() {
                 type="date"
                 value={toDate()}
                 onChange={(e) => setToDate(e.target.value)}
-                class="bg-white border-gray-300 dark:border-gray-800 color-scheme:light dark:[color-scheme:dark] dark:bg-black border accent-slate-600  text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-black-700  dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                class="bg-white  border-gray-300 dark:border-gray-800 color-scheme:light dark:[color-scheme:dark] dark:bg-black border accent-slate-600  text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-black-700  dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Select date end"
               />
             </div>
@@ -169,29 +197,42 @@ interface TextInputComponentProps {
   label?: string;
   value?: string | number;
   subtext?: string;
-  onChange?: (e: any) => void;
+  recommended?: string[];
+  onChange: (e: any) => void;
 }
-function TextInputComponent({
-  label,
-  value,
-  subtext,
-  onChange,
-}: TextInputComponentProps) {
+function TextInputComponent(props: TextInputComponentProps) {
+  //avoiding destructuring to avoid lost of reactivity
+  // function to set value of input tag to selected recommended value
+  function setRecommendedValue(value: string) {
+    console.log(value);
+    props.onChange({ target: { value: value } });
+  }
   return (
-    <div class="relative w-full min-w-[200px] my-4">
+    <div class="relative group w-full min-w-[200px] my-4">
       <input
         class="peer w-full h-full bg-white dark:bg-black text-black dark:text-white font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-gray-700 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-gray-800 placeholder-shown:border-t-gray-800 border focus:border-2 border-t-transparent focus:border-t-transparent text-sm px-3 py-2.5 rounded-[7px] border-gray-300 dark:border-gray-800 focus:border-blue-500"
         placeholder=""
-        onChange={onChange}
-        value={value ? value : ""}
+        onChange={props.onChange}
+        value={props.value ? props.value : ""}
       />
       <label class="flex w-full h-full select-none pointer-events-none absolute left-0 font-normal !overflow-visible truncate peer-placeholder-shown:text-gray-500 leading-tight peer-focus:leading-tight peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-gray-500 transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] before:content[' '] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all peer-disabled:before:border-transparent after:content[' '] after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-disabled:after:border-transparent peer-placeholder-shown:leading-[3.75] text-gray-500 peer-focus:text-blue-500 before:border-gray-800 peer-focus:before:!border-blue-500 after:border-gray-800 peer-focus:after:!border-blue-500">
-        {label}
+        {props.label}
       </label>
+      {/* recommended list show when input tag is on focus */}
+      {props.recommended && (
+        <div class=" hidden group-focus-within:block absolute z-10 w-full bg-white dark:bg-black border border-gray-300 dark:border-gray-800 rounded-b-lg shadow-lg">
+          {props.recommended.map((item) => (
+            <div onmouseover={()=>setRecommendedValue(item)} class="px-3 py-2.5 text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-900 cursor-pointer">
+              {item}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* subtext */}
       <div>
         <p style={{ "font-size": "10px" }} class="ml-1 text-gray-500">
-          {subtext}
+          {props.subtext}
         </p>
       </div>
     </div>
