@@ -15,6 +15,18 @@ export default function App() {
 
   // Check for initial preference
   onMount(() => {
+    chrome.runtime.sendMessage({ query: "getURL" }, (response) => {
+      if (response.tabURL) {
+        // Now you have the active tab's URL
+        // Parse it and extract the username as needed
+        const url = new URL(response.tabURL);
+        const pathSegments = url.pathname.split('/').filter(Boolean);
+        if (pathSegments.length > 0 && url.hostname === "twitter.com") {
+          const twitterUsername = pathSegments[0];
+          setAccount(twitterUsername); // Your state update function
+        }
+      }
+    });
     const prefersDark = window.matchMedia(
       "(prefers-color-scheme: dark)"
     ).matches;

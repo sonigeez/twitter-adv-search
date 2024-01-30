@@ -22,6 +22,11 @@ export default defineManifest(async (env) => ({
   action: {
     default_popup: "index.html",
   },
+  permissions: ["activeTab"],
+  background: {
+    service_worker: "src/background.ts",
+    type: "module",
+  },
 
   //logo
   icons: {
@@ -30,12 +35,4 @@ export default defineManifest(async (env) => ({
     48: "public/icons/icon48.png",
     128: "public/icons/icon128.png",
   },
-
-  // content_scripts: [
-  //   {
-  //     //should match exact url
-  //     matches: ["https://twitter.com/*"],
-  //     js: ["scripts/twitter.js"],
-  //   },
-  // ],
 }));
