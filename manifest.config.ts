@@ -13,8 +13,8 @@ export default defineManifest(async (env) => ({
   manifest_version: 3,
   name:
     env.mode === "staging"
-      ? "[INTERNAL] Twitter Advanced Search"
-      : "Twitter Advanced Search",
+      ? "[INTERNAL] X(Twitter) Helper"
+      : "X(Twitter) Addons",
   // up to four numbers separated by dots
   version: `${major}.${minor}.${patch}.${label}`,
   // semver is OK in "version_name"
@@ -22,11 +22,14 @@ export default defineManifest(async (env) => ({
   action: {
     default_popup: "index.html",
   },
-  permissions: ["activeTab"],
+  permissions: ["activeTab", "storage", "scripting","tabs", "unlimitedStorage",  
+],
   background: {
     service_worker: "src/background.ts",
     type: "module",
   },
+
+  content_scripts: [{ matches: ["https://twitter.com/*"], js: ["src/content.js"] }],
 
   //logo
   icons: {
