@@ -19,7 +19,7 @@ export default function SearchBar() {
             if (response.tabURL) {
                 const url = new URL(response.tabURL);
                 const pathSegments = url.pathname.split('/').filter(Boolean);
-                if (pathSegments.length > 0 && url.hostname === "twitter.com") {
+                if (pathSegments.length > 0 && url.hostname === "x.com") {
                     const twitterUsername = pathSegments[0];
                     if (avoidList.includes(twitterUsername)) {
                         return;
@@ -28,11 +28,6 @@ export default function SearchBar() {
                 }
             }
         });
-        // chrome.runtime.sendMessage({ query: "getBookmarks" }, (response) => {
-        //     response.bookmarks && setBookmarks(response.bookmarks[0]);
-        //     console.log(bookmarks());
-
-        // });
 
     });
 
@@ -66,7 +61,7 @@ export default function SearchBar() {
 
     const onSubmit = (e: any) => {
         e.preventDefault();
-        let url = "https://twitter.com/search?lang=en&q=";
+        let url = "https://x.com/search?lang=en&q=";
         if (word()) {
             url += word();
         }

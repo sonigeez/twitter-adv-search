@@ -1,5 +1,5 @@
 export default function getAllBookmarks() {
-    const TWITTER_BOOKMARKS_URL = "https://twitter.com/i/bookmarks";
+    const TWITTER_BOOKMARKS_URL = "https://x.com/i/bookmarks";
     const SCROLL_INTERVAL = 800;
     const SCROLL_STEP = 5000;
     const MAX_UNCHANGED_COUNT = 10;

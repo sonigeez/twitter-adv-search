@@ -6,56 +6,68 @@ chrome.runtime.onMessage.addListener(function (request, _, sendResponse) {
     });
     return true;
   }
-  if(request.action === "saveToLocalStorage"){
-    // localStorage.setItem("tweetBookmarks", JSON.stringify(request.data));
-    chrome.storage.local.set({tweetBookmarks: JSON.stringify(request.tweets)}, function() {
-      console.log('Value is set to ' + request.data);
+
+  if (request.action === "setLikeThreshold") {
+    chrome.storage.local.set({ likeThreshold: request.threshold }, function () {
+      console.log("Like threshold is set to " + request.threshold);
     });
     return true;
   }
-  if(request.action === "getLocalStorage"){
-    // const data = localStorage.getItem("tweetBookmarks");
-    // sendResponse({data: JSON.parse(data?? "[]")});
-     chrome.storage.local.get(['tweetBookmarks'], function(result) {
-      console.log('Value currently is ' + result.tweetBookmarks);
-      sendResponse({data: JSON.parse(result.tweetBookmarks?? "[]")});
+
+  if (request.action === "getLikeThreshold") {
+    chrome.storage.local.get(["likeThreshold"], function (result) {
+      console.log("Value currently is " + result.likeThreshold);
+      sendResponse({ data: result.likeThreshold || 10000 });
     });
     return true;
   }
-  // clicked_browser_action
+  if (request.action === "saveToLocalStorage") {
+    chrome.storage.local.set(
+      { tweetBookmarks: JSON.stringify(request.tweets) },
+      function () {
+        console.log("Value is set to " + request.data);
+      }
+    );
+    return true;
+  }
+  if (request.action === "getLocalStorage") {
+    chrome.storage.local.get(["tweetBookmarks"], function (result) {
+      console.log("Value currently is " + result.tweetBookmarks);
+      sendResponse({ data: JSON.parse(result.tweetBookmarks ?? "[]") });
+    });
+    return true;
+  }
+  if (request.action === "isHideHighLikes") {
+    // check if isHideHighLikes to true
+    chrome.storage.local.get(["isHideHighLikes"], function (result) {
+      console.log("Value currently is " + result.isHideHighLikes);
+      sendResponse({ data: result.isHideHighLikes });
+    });
+    return true;
+  }
+  if (request.action === "setHideHighLikes") {
+    console.log("setHideHighLikes");
+    console.log(request.isHideHighLikes);
+    chrome.storage.local.set(
+      { isHideHighLikes: request.isHideHighLikes },
+      function () {
+        console.log("Value is set to " + request.isHideHighLikes);
+      }
+    );
+    return true;
+  }
   if (request.message === "injectScript") {
-    //create a new tab
-    console.log("helloooooooo")
-    chrome.tabs.create({ url: "https://twitter.com/i/bookmarks/all" }).then((tab) => {
+    console.log("helloooooooo");
+    chrome.tabs.create({ url: "https://x.com/i/bookmarks/all" }).then((tab) => {
       console.log(tab.id);
 
-      //wait for the 5 second
       setTimeout(() => {
-        //execrut content.js
-        console.log("hello")
-        //send message to content.js
-        // chrome.tabs.sendMessage(tab.id, { action: "triggerFunction" });
-        chrome.tabs.sendMessage(tab.id!, { action: 'triggerFunction' });
-
+        console.log("hello");
+        chrome.tabs.sendMessage(tab.id!, { action: "triggerFunction" });
       }, 5000);
-  });
+    });
     return true;
   }
 });
 
-
-// chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-//   if(changeInfo.url === "https://twitter.com/i/bookmarks/all"){
-
-//      console.log("onUpdated." + " url is "+changeInfo.url);
-//   chrome.tabs.sendMessage(tabId, {action: "triggerFunction"});
-
-
-//   }
-
-// });
-
-// function showNotification() {
-
-//   console.log("showNotification");
 // }

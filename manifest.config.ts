@@ -22,14 +22,19 @@ export default defineManifest(async (env) => ({
   action: {
     default_popup: "index.html",
   },
-  permissions: ["activeTab", "storage", "scripting","tabs", "unlimitedStorage",  
-],
+  permissions: [
+    "activeTab",
+    "storage",
+    "scripting",
+    "tabs",
+    "unlimitedStorage",
+  ],
   background: {
     service_worker: "src/background.ts",
     type: "module",
   },
 
-  content_scripts: [{ matches: ["https://twitter.com/*"], js: ["src/content.js"] }],
+  content_scripts: [{ matches: ["https://x.com/*"], js: ["src/content.js"] }],
 
   //logo
   icons: {
